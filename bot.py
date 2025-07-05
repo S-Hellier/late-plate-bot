@@ -6,7 +6,12 @@ GROUPME_BOT_ID = os.getenv("BOT_ID")
 TOKEN = os.getenv("TOKEN")
 GROUP_ID = os.getenv("GROUP_ID")
 
-async def sendGroupMeMessage(text: str) -> str:
+message = "Good Evening! Please like this message if you can pick up late plates today!"
+
+def second_message(user: str):
+    return f'Thank you to {user} for volunteering!\nEveryone else, please like this message if you need a late plate picked up!'
+
+async def sendGroupMeMessage(text: str = message) -> str:
     url = f"https://api.groupme.com/v3/bots/post?token={os.getenv('TOKEN')}"
     payload = {
         "bot_id": GROUPME_BOT_ID,
@@ -17,7 +22,7 @@ async def sendGroupMeMessage(text: str) -> str:
         if response.status_code != 202:
             print(f"Failed to send message: {response.text}")
             return None
-        await asyncio.sleep(1)  # Optional: to avoid hitting rate limits
+        await asyncio.sleep(1)
     
         return await getLatestBotMessageId(text)
 
@@ -49,3 +54,13 @@ async def waitForFirstLike(message_id: str):
                 await sendGroupMeMessage("")
                 return
         await asyncio.sleep(5)
+
+async def getUserNameById(user_id: str) -> str:
+    url = f"https://api.groupme.com/v3/users/{user_id}?token={TOKEN}"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        if response.status_code != 200:
+            print(f"Failed to fetch user: {response.text}")
+            return None
+        user_data = response.json().get("response", {})
+        return user_data.get("name", "Unknown User")
