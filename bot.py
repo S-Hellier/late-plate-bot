@@ -47,8 +47,7 @@ async def getLatestBotMessageId(text: str) -> str:
     url = f"{BASE_URL}/groups/{GROUP_ID}/messages?token={os.getenv('TOKEN')}"
     print(f"url: {url}")
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, params={"limit": 5})
-        print(response)
+        response = await client.get(url)
         messages = response.json().get("response", {}).get("messages", [])
         for message in messages:
             if message.get("text") == text and message.get("sender_type") == "bot":
