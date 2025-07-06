@@ -45,8 +45,10 @@ async def sendSecondMessage(text: str):
 
 async def getLatestBotMessageId(text: str) -> str:
     url = f"{BASE_URL}/groups/{GROUP_ID}/messages?token={os.getenv('TOKEN')}"
+    print(f"url: {url}")
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params={"limit": 5})
+        print(response)
         messages = response.json().get("response", {}).get("messages", [])
         for message in messages:
             if message.get("text") == text and message.get("sender_type") == "bot":
@@ -91,10 +93,12 @@ async def getAllUsersInGroup() -> list:
     
 async def messageFlow():
     first_message_id = await sendFirstMessage()
-    first_like_uname = await waitForFirstLike(first_message_id)
-    if first_like_uname:
-        second_message = second_message(first_like_uname)
-        sendSecondMessage(second_message)
+    if first_message_id:
+        print(f"First Message ID: {first_message_id}")
+        # first_like_uname = await waitForFirstLike(first_message_id)
+        # if first_like_uname:
+        #     second_message = second_message(first_like_uname)
+        #     sendSecondMessage(second_message)
 
 def main():
     print("Starting process")
