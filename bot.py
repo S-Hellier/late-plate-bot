@@ -12,7 +12,7 @@ message = "Good Evening! Please like this message if you can pick up late plates
 def second_message(user: str):
     return f'Thank you to {user} for volunteering!\nEveryone else, please like this message if you need a late plate picked up!'
 
-async def sendGroupMeMessage(text: str = message) -> str:
+async def sendFirstMessage(text: str = message) -> str:
     url = f"{BASE_URL}/bots/post"
     payload = {
         "bot_id": GROUPME_BOT_ID,
@@ -26,6 +26,22 @@ async def sendGroupMeMessage(text: str = message) -> str:
         await asyncio.sleep(1)
     
         return await getLatestBotMessageId(text)
+    
+async def sendSecondMessage(text: str):
+    url = f"{BASE_URL}/bots/post"
+    payload = {
+        "bot_id": GROUPME_BOT_ID,
+        "text": text
+    }
+    async with httpx.AsyncClient() as client: 
+        response = await client.post(url, json=payload)
+        if response.status_code != 200:
+            print(f'Failed to send second message: {response.text}')
+            return None
+        await asyncio.sleep(1)
+
+        print(f"Second message successfully sent: {response.text}")
+        return None
 
 async def getLatestBotMessageId(text: str) -> str:
     url = f"{BASE_URL}/groups/{GROUP_ID}/messages?token={os.getenv('TOKEN')}"
@@ -72,3 +88,10 @@ async def getAllUsersInGroup() -> list:
         group_data = response.json().get("response", {})
         group_users = group_data.get("members", [])
         return [{"id": user.get("user_id"), "name": user.get("nickname")} for user in group_users]
+    
+async def messageFlow():
+    first_message_id = await sendFirstMessage(text=message)
+    first_like_uname = await waitForFirstLike(first_message_id)
+    if first_like_uname:
+        second_message = second_message(first_like_uname)
+        sendSecondMessage(second_message)
