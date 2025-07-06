@@ -7,12 +7,12 @@ TOKEN = os.getenv("TOKEN")
 GROUP_ID = os.getenv("GROUP_ID")
 BASE_URL = os.getenv("BASE_URL")
 
-message = "Good Evening! Please like this message if you can pick up late plates today!"
+first_message = "Good Evening! Please like this message if you can pick up late plates today!"
 
 def second_message(user: str):
     return f'Thank you to {user} for volunteering!\nEveryone else, please like this message if you need a late plate picked up!'
 
-async def sendFirstMessage(text: str = message) -> str:
+async def sendFirstMessage(text: str = first_message) -> str:
     url = f"{BASE_URL}/bots/post"
     payload = {
         "bot_id": GROUPME_BOT_ID,
@@ -20,7 +20,7 @@ async def sendFirstMessage(text: str = message) -> str:
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(url, json=payload)
-        if response.status_code != 200:
+        if response.status_code != 202:
             print(f"Failed to send message: {response.text}")
             return None
         await asyncio.sleep(1)
@@ -90,8 +90,15 @@ async def getAllUsersInGroup() -> list:
         return [{"id": user.get("user_id"), "name": user.get("nickname")} for user in group_users]
     
 async def messageFlow():
-    first_message_id = await sendFirstMessage(text=message)
+    first_message_id = await sendFirstMessage()
     first_like_uname = await waitForFirstLike(first_message_id)
     if first_like_uname:
         second_message = second_message(first_like_uname)
         sendSecondMessage(second_message)
+
+def main():
+    print("Starting process")
+    asyncio.run(messageFlow())
+
+if __name__ == "__main__":
+    main()
