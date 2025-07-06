@@ -35,7 +35,7 @@ async def sendSecondMessage(text: str):
     }
     async with httpx.AsyncClient() as client: 
         response = await client.post(url, json=payload)
-        if response.status_code != 200:
+        if response.status_code != 202:
             print(f'Failed to send second message: {response.text}')
             return None
         await asyncio.sleep(1)
@@ -56,22 +56,26 @@ async def getLatestBotMessageId(text: str) -> str:
     
 async def waitForFirstLike(message_id: str):
     url = f"{BASE_URL}/groups/{GROUP_ID}/messages/{message_id}?token={TOKEN}"
-    while True:
-        async with httpx.AsyncClient() as client:
+    print(url)
+    async with httpx.AsyncClient() as client:
+        while True:
             response = await client.get(url)
             if response.status_code != 200:
                 print(f"Failed to fetch message: {response.text}")
                 return None
-            data = response.json().get("response", "message")
-            liked_by = data.get("favorited_by", [])
-            print("Python type of liked by: ", str(type(liked_by)))
-
-            # Assuming its a list of strings
-            if len(liked_by) > 0:
+            liked_by = None
+            data = response.json().get("response", {})
+            # print(f"data keys: {data.keys()}")
+            print(f"message: {data['message']}")
+            print(f"Favorited_by: {data['message']['favorited_by']}")
+            liked_by = data["message"]["favorited_by"]
+            if liked_by and len(liked_by) > 0:    
                 user_id = liked_by[0]
                 users = await getAllUsersInGroup()
+                print(f"returning user: {user_id}")
                 return getUserNameById(user_id, users)
-        await asyncio.sleep(10)
+
+            await asyncio.sleep(5)
 
 def getUserNameById(user_id: str, users: list) -> str:
     for user in users:
@@ -93,11 +97,11 @@ async def getAllUsersInGroup() -> list:
 async def messageFlow():
     first_message_id = await sendFirstMessage()
     if first_message_id:
-        print(f"First Message ID: {first_message_id}")
-        # first_like_uname = await waitForFirstLike(first_message_id)
-        # if first_like_uname:
-        #     second_message = second_message(first_like_uname)
-        #     sendSecondMessage(second_message)
+        # print(f"First Message ID: {first_message_id}")
+        first_like_uname = await waitForFirstLike(first_message_id)
+        if first_like_uname:
+            second_message_text = second_message(first_like_uname)
+            await sendSecondMessage(second_message_text)
 
 def main():
     print("Starting process")
