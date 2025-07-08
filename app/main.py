@@ -1,12 +1,16 @@
 # main.py
 from fastapi import FastAPI
 from scheduler import startScheduler
+from contextlib import asynccontextmanager
 
 app = FastAPI()
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Running bot")
     startScheduler()
+    yield
+    print("Bot shutting down")
 
 @app.get("/")
 async def root():
