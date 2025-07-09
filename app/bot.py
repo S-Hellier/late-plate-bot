@@ -65,14 +65,11 @@ async def waitForFirstLike(message_id: str):
                 return None
             liked_by = None
             data = response.json().get("response", {})
-            # print(f"data keys: {data.keys()}")
-            print(f"message: {data['message']}")
-            print(f"Favorited_by: {data['message']['favorited_by']}")
+            print(f"Liked by: {data['message']['favorited_by']}")
             liked_by = data["message"]["favorited_by"]
             if liked_by and len(liked_by) > 0:    
                 user_id = liked_by[0]
                 users = await getAllUsersInGroup()
-                print(f"returning user: {user_id}")
                 return getUserNameById(user_id, users)
 
             await asyncio.sleep(5)
@@ -88,7 +85,7 @@ async def getAllUsersInGroup() -> list:
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         if response.status_code != 200:
-            print("Failed to fetch group details")
+            # print("Failed to fetch group details")
             return None
         group_data = response.json().get("response", {})
         group_users = group_data.get("members", [])
@@ -103,9 +100,9 @@ async def messageFlow():
             second_message_text = second_message(first_like_uname)
             await sendSecondMessage(second_message_text)
 
-def main():
-    print("Starting process")
-    asyncio.run(messageFlow())
+# def main():
+#     print("Starting process")
+#     asyncio.run(messageFlow())
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
