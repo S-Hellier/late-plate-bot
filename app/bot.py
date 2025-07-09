@@ -100,9 +100,9 @@ async def messageFlow():
             second_message_text = second_message(first_like_uname)
             await sendSecondMessage(second_message_text)
 
-# def main():
-#     print("Starting process")
-#     asyncio.run(messageFlow())
+def scheduledMessageWorkflow():
+    print("Starting process")
+    asyncio.run(messageFlow())
 
 # if __name__ == "__main__":
 #     main()
