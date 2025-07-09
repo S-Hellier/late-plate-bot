@@ -5,6 +5,6 @@ from bot import scheduledMessageWorkflow
 scheduler = AsyncIOScheduler()
 
 def startScheduler():
-    trigger = CronTrigger(day_of_week='mon-thu', hour=16, minute=0)
+    trigger = CronTrigger(day_of_week='mon-thu', hour=22, minute=0)
     scheduler.add_job(scheduledMessageWorkflow, trigger)
     scheduler.start()
