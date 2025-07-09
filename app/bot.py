@@ -104,5 +104,5 @@ def scheduledMessageWorkflow():
     print("Starting process")
     asyncio.run(messageFlow())
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    scheduledMessageWorkflow()
