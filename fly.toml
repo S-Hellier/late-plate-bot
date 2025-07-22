@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for late-plate-bot on 2025-07-08T20:36:03-04:00
+# fly.toml app configuration file generated for late-plate-bot-green-shape-1404 on 2025-07-17T21:37:28-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'late-plate-bot'
+app = 'late-plate-bot-green-shape-1404'
 primary_region = 'iad'
 
 [build]

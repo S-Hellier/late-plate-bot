@@ -1,6 +1,6 @@
 # main.py
 from fastapi import FastAPI
-from scheduler import startScheduler
+from app.scheduler import startScheduler
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
